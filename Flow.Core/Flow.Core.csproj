@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
+    <BaseOutputPath>$(SolutionDir)lib\$(Configuration)\</BaseOutputPath>
   </PropertyGroup>
 
 </Project>
