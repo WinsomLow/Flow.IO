@@ -1,7 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace FlowDrafter.Controls
+namespace Flow.Drafter.Controls
 {
     public partial class RoundedButton : UserControl
     {
