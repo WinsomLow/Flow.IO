@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Flow.Drafter"
-        xmlns:controls="clr-namespace:Flow.Drafter.Controls"
         mc:Ignorable="d"
         Title="Flow.IO" Height="800" Width="1200">
     <Grid>
@@ -30,6 +29,8 @@
                     <ListBoxItem Content="Decision" Padding="8" Margin="0,0,0,6" />
                     <ListBoxItem Content="End" Padding="8" />
                 </ListBox>
+                <Button>Save</Button>
+                <Button>Load</Button>
             </StackPanel>
         </Border>
         <Border Grid.Column="1"
