@@ -15,23 +15,21 @@
                 Background="#FFF2F4F7"
                 BorderBrush="#FFD7DCE3"
                 BorderThickness="0,0,1,0">
-            <StackPanel Margin="12">
-                <TextBlock Text="Flow Blocks"
+            <DockPanel Margin="12">
+                <Button Height="20" Margin="10 10 10 10" DockPanel.Dock="Bottom">Load</Button>
+                <Button Height="20" Margin="10 10 10 10" DockPanel.Dock="Bottom">Save</Button>
+                <StackPanel DockPanel.Dock="Top">
+                    <TextBlock Text="Flow Blocks"
                            FontSize="16"
                            FontWeight="SemiBold"
                            Margin="0,0,0,12" />
-                <ListBox x:Name="FlowBlockList"
+                    <ListBox x:Name="FlowBlockList"
                          BorderThickness="0"
                          Background="Transparent"
                          PreviewMouseMove="FlowBlockList_OnPreviewMouseMove">
-                    <ListBoxItem Content="Start" Padding="8" Margin="0,0,0,6" />
-                    <ListBoxItem Content="Process" Padding="8" Margin="0,0,0,6" />
-                    <ListBoxItem Content="Decision" Padding="8" Margin="0,0,0,6" />
-                    <ListBoxItem Content="End" Padding="8" />
-                </ListBox>
-                <Button>Save</Button>
-                <Button>Load</Button>
-            </StackPanel>
+                    </ListBox>
+                </StackPanel>
+            </DockPanel>
         </Border>
         <Border Grid.Column="1"
                 Background="White"

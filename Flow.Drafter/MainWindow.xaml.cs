@@ -1,7 +1,10 @@
-using Flow.Drafter.Controls;
+using Flow.Core;
+using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Path = System.IO.Path;
 
 namespace Flow.Drafter
 {
@@ -14,10 +17,12 @@ namespace Flow.Drafter
     private Point _dragStart;
     private Point _nodeStart;
     private FrameworkElement? _draggedNode;
+    private readonly Dictionary<string, Type> _flowControlTypes = new(StringComparer.OrdinalIgnoreCase);
 
     public MainWindow()
     {
       InitializeComponent();
+      LoadFlowPlugins();
     }
 
     private void FlowBlockList_OnPreviewMouseMove(object sender, MouseEventArgs e)
@@ -69,21 +74,40 @@ namespace Flow.Drafter
       }
 
       Point position = e.GetPosition(DesignCanvas);
-      RoundedButton node = CreateFlowNode(label);
+      FlowControl? node = CreateFlowNode(label);
+      if (node is null)
+      {
+        return;
+      }
 
       Canvas.SetLeft(node, position.X - node.Width / 2);
       Canvas.SetTop(node, position.Y - node.Height / 2);
       DesignCanvas.Children.Add(node);
     }
 
-    private RoundedButton CreateFlowNode(string label)
+    private FlowControl? CreateFlowNode(string label)
     {
-      RoundedButton node = new()
+      if (!_flowControlTypes.TryGetValue(label, out Type? flowType))
       {
-        Width = 140,
-        Height = 48,
-        Text = label
-      };
+        MessageBox.Show($"No FlowControl registered for '{label}'.",
+          "Flow.IO",
+          MessageBoxButton.OK,
+          MessageBoxImage.Warning);
+        return null;
+      }
+
+      if (Activator.CreateInstance(flowType) is not FlowControl node)
+      {
+        MessageBox.Show($"Failed to create FlowControl '{flowType.FullName}'.",
+          "Flow.IO",
+          MessageBoxButton.OK,
+          MessageBoxImage.Warning);
+        return null;
+      }
+
+      node.Width = 140;
+      node.Height = 48;
+      TrySetLabel(node, label);
 
       node.AddHandler(UIElement.PreviewMouseLeftButtonDownEvent,
         new MouseButtonEventHandler(Node_OnMouseLeftButtonDown),
@@ -152,6 +176,108 @@ namespace Flow.Drafter
     {
       double top = Canvas.GetTop(element);
       return double.IsNaN(top) ? 0 : top;
+    }
+
+    private void LoadFlowPlugins()
+    {
+      List<(string Label, Type Type)> controls = new();
+
+      foreach (Type type in LoadFlowControlTypes())
+      {
+        if (type.IsAbstract || !typeof(FlowControl).IsAssignableFrom(type))
+        {
+          continue;
+        }
+
+        string label = GetFlowTypeLabel(type);
+        if (string.IsNullOrWhiteSpace(label))
+        {
+          label = type.Name;
+        }
+
+        controls.Add((label, type));
+      }
+
+      if (controls.Count == 0)
+      {
+        return;
+      }
+
+      _flowControlTypes.Clear();
+      FlowBlockList.Items.Clear();
+
+      for (int i = 0; i < controls.Count; i++)
+      {
+        bool isLast = i == controls.Count - 1;
+        (string label, Type type) = controls[i];
+        _flowControlTypes[label] = type;
+        FlowBlockList.Items.Add(CreateFlowBlockListItem(label, isLast));
+      }
+    }
+
+    private static ListBoxItem CreateFlowBlockListItem(string label, bool isLast)
+    {
+      return new ListBoxItem
+      {
+        Content = label,
+        Padding = new Thickness(8),
+        Margin = isLast ? new Thickness(0) : new Thickness(0, 0, 0, 6)
+      };
+    }
+
+    private static IEnumerable<Type> LoadFlowControlTypes()
+    {
+      string? dir = Directory.GetParent(AppContext.BaseDirectory)?.FullName;
+
+      if (string.IsNullOrWhiteSpace(dir))
+      {
+        return Array.Empty<Type>();
+      }
+
+      string? path = Path.Combine(dir, "Flow.Component.dll");
+
+      if (string.IsNullOrWhiteSpace(path))
+      {
+        return Array.Empty<Type>();
+      }
+
+      Assembly assembly;
+      try
+      {
+        assembly = Assembly.LoadFrom(path);
+      }
+      catch
+      {
+        return Array.Empty<Type>();
+      }
+
+      try
+      {
+        return assembly.GetTypes();
+      }
+      catch (ReflectionTypeLoadException ex)
+      {
+        return ex.Types.Where(type => type is not null).Cast<Type>();
+      }
+    }
+
+    private static string GetFlowTypeLabel(Type type)
+    {
+      if (Activator.CreateInstance(type) is not FlowControl instance)
+      {
+        return type.Name;
+      }
+
+      return instance.FlowType;
+    }
+
+    private static void TrySetLabel(FlowControl control, string label)
+    {
+      PropertyInfo? textProperty = control.GetType().GetProperty("Text", BindingFlags.Instance | BindingFlags.Public);
+      if (textProperty?.CanWrite == true && textProperty.PropertyType == typeof(string))
+      {
+        textProperty.SetValue(control, label);
+      }
     }
   }
 }

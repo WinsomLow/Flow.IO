@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <BaseOutputPath>$(SolutionDir)bin\$(Configuration)\</BaseOutputPath>
+    <BaseOutputPath>$(SolutionDir)bin\</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
