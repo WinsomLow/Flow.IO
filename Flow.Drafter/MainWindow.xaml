@@ -12,32 +12,26 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Border Grid.Column="0"
-                Background="#FFF2F4F7"
-                BorderBrush="#FFD7DCE3"
-                BorderThickness="0,0,1,0">
+                Style="{StaticResource SidebarBorderStyle}">
             <DockPanel Margin="12">
-                <Button Height="20" Margin="10 10 10 10" DockPanel.Dock="Bottom">Load</Button>
-                <Button Height="20" Margin="10 10 10 10" DockPanel.Dock="Bottom">Save</Button>
+                <Button Style="{StaticResource SidebarActionButtonStyle}"
+                        DockPanel.Dock="Bottom">Load</Button>
+                <Button Style="{StaticResource SidebarActionButtonStyle}"
+                        DockPanel.Dock="Bottom">Save</Button>
                 <StackPanel DockPanel.Dock="Top">
                     <TextBlock Text="Flow Blocks"
-                           FontSize="16"
-                           FontWeight="SemiBold"
-                           Margin="0,0,0,12" />
+                               Style="{StaticResource SectionHeaderTextStyle}" />
                     <ListBox x:Name="FlowBlockList"
-                         BorderThickness="0"
-                         Background="Transparent"
-                         PreviewMouseMove="FlowBlockList_OnPreviewMouseMove">
+                             Style="{StaticResource FlowBlockListStyle}"
+                             PreviewMouseMove="FlowBlockList_OnPreviewMouseMove">
                     </ListBox>
                 </StackPanel>
             </DockPanel>
         </Border>
         <Border Grid.Column="1"
-                Background="White"
-                BorderBrush="#FFE3E6EA"
-                BorderThickness="1">
+                Style="{StaticResource CanvasBorderStyle}">
             <Canvas x:Name="DesignCanvas"
-                    Background="Transparent"
-                    AllowDrop="True"
+                    Style="{StaticResource DesignCanvasStyle}"
                     DragOver="DesignCanvas_OnDragOver"
                     Drop="DesignCanvas_OnDrop" />
         </Border>
