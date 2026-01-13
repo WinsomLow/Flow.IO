@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace FlowDrafter
+namespace Flow.Drafter
 {
     /// <summary>
     /// Interaction logic for App.xaml
