@@ -1,8 +1,6 @@
 using Flow.Core.Common;
 using Flow.Core.Model;
 using Flow.Core.ViewModel;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Controls;
 
@@ -10,7 +8,7 @@ namespace Flow.Core.Control
 {
   public abstract class FlowControl : UserControl
   {
-    public const string ApiVersionString = "1.0.0";
+    public const string ApiVersionString = "2.0.0";
     public static Version ApiVersion { get; } = Version.Parse(ApiVersionString);
 
     public abstract FlowViewModel ViewModel { get; }

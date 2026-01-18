@@ -1,5 +1,3 @@
-using System;
-
 namespace Flow.Core.Control
 {
   [AttributeUsage(AttributeTargets.Class, Inherited = false)]
