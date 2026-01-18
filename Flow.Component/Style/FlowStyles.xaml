@@ -1,34 +1,49 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:core="clr-namespace:Flow.Core;assembly=Flow.Core">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
     <Style x:Key="ProcessNodeBorderStyle" TargetType="Border">
-        <Setter Property="Background" Value="#FFFFFFFF" />
-        <Setter Property="BorderBrush" Value="#FF2F3B4A" />
+        <Setter Property="Background" Value="#2B2B2B" />
+        <Setter Property="Width" Value="200" />
+        <Setter Property="Height" Value="120" />
+        <Setter Property="BorderBrush" Value="#666" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="8" />
-        <Setter Property="Padding" Value="8,4" />
+        <!--<Setter Property="Padding" Value="8,4" />-->
     </Style>
 
-    <Style x:Key="ProcessTextBoxStyle" TargetType="TextBox">
-        <Setter Property="Background" Value="Transparent" />
+    <Style x:Key="ProcessHeaderStyle" TargetType="Border">
+        <Setter Property="Background" Value="#333" />
+        <Setter Property="CornerRadius" Value="8, 8, 0, 0" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Foreground" Value="#FF1F2933" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 
-    <Style x:Key="ConnectorDotStyle" TargetType="Ellipse">
-        <Setter Property="Width" Value="10" />
-        <Setter Property="Height" Value="10" />
-        <Setter Property="Fill" Value="#FF2F3B4A" />
-        <Setter Property="Stroke" Value="#FFFFFFFF" />
-        <Setter Property="StrokeThickness" Value="1" />
-        <Setter Property="Visibility" Value="Collapsed" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=core:FlowControl}}" Value="True">
-                <Setter Property="Visibility" Value="Visible" />
-            </DataTrigger>
-        </Style.Triggers>
+    <Style x:Key="ProcessHeaderFontStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Margin" Value="8,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
+
+    <Style x:Key="ProcessRichTextBoxStyle" TargetType="RichTextBox">
+        <Setter Property="Margin" Value="8"/>
+        <Setter Property="Foreground" Value="#BBB"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="AcceptsReturn" Value="True"/>
+        <Setter Property="AcceptsTab" Value="True"/>
+        <Setter Property="VerticalScrollBarVisibility" Value="Disabled"/>
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+        <Setter Property="Padding" Value="0"/>
+    </Style>
+
+    <Style x:Key="ProcessDocumentStyle" TargetType="FlowDocument">
+        <Setter Property="PagePadding" Value="0"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="LineHeight" Value="16"/>
+    </Style>
+
+    <Style x:Key="ProcessParagraphStyle" TargetType="Paragraph">
+        <Setter Property="Margin" Value="0"/>
+    </Style>
+
 </ResourceDictionary>

@@ -9,8 +9,6 @@ namespace Flow.Core.ViewModel
   {
     private readonly Connection m_model;
     private Geometry m_path = Geometry.Empty;
-    private double m_centerX = 0;
-    private double m_centerY = 0;
 
     public ConnectionViewModel(Connection model)
     {

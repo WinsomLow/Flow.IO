@@ -5,7 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:core="clr-namespace:Flow.Core.Control;assembly=Flow.Core"
              xmlns:local="clr-namespace:Flow.Component.Component"
-             mc:Ignorable="d">
+             mc:Ignorable="d"   
+             MouseLeftButtonDown="Border_MouseLeftButtonDown"
+             PreviewMouseMove="Border_PreviewMouseMove"
+             MouseLeftButtonUp="Border_MouseLeftButtonUp">
     <core:FlowControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -13,10 +16,37 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:FlowControl.Resources>
-    
+
     <Grid>
-        <Border Style="{StaticResource ProcessNodeBorderStyle}">
-            <TextBox Style="{StaticResource ProcessTextBoxStyle}" />
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <core:InNodeControl Grid.Column="0"></core:InNodeControl>
+        
+        <Border Grid.Column="1" Style="{StaticResource ProcessNodeBorderStyle}" >
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="28"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Style="{StaticResource ProcessHeaderStyle}" >
+                    <TextBlock Text="Process" Style="{StaticResource ProcessHeaderFontStyle}"/>
+                </Border>
+                <RichTextBox Grid.Row="1"
+                             Style="{StaticResource ProcessRichTextBoxStyle}">
+                    <FlowDocument Style="{StaticResource ProcessDocumentStyle}">
+                        <Paragraph Style="{StaticResource ProcessParagraphStyle}">                           
+                        </Paragraph>
+                    </FlowDocument>
+                </RichTextBox>
+
+            </Grid>
         </Border>
+
+        <core:OutNodeControl Grid.Column="2"></core:OutNodeControl>
     </Grid>
 </core:FlowControl>

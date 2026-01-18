@@ -65,7 +65,7 @@
     <Setter Property="Background" Value="Transparent" />
   </Style>
 
-  <Style x:Key="DesignCanvasStyle" TargetType="ItemsControl">
+  <Style x:Key="DesignCanvasStyle" TargetType="Canvas">
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="AllowDrop" Value="True" />
   </Style>

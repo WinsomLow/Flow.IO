@@ -1,4 +1,6 @@
-using Flow.Drafter.Common.Helper;
+using Flow.Core.Common;
+using Flow.Core.Control;
+using Flow.Drafter.Common.Util;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,9 +13,13 @@ namespace Flow.Drafter
   /// </summary>
   public partial class MainWindow : Window
   {
+    private Dictionary<string, FlowControl> m_flowControlCollectors = new(StringComparer.Ordinal);
+    private readonly Editor m_editor;
+
     public MainWindow()
     {
       InitializeComponent();
+      m_editor = new Editor(m_DesignCanvas);
       DataContext = new MainWindowViewModel();
       LoadFlowPlugins();
     }
@@ -29,14 +35,14 @@ namespace Flow.Drafter
 
       string? path = Path.Combine(dir, "Flow.Component.dll");
 
-      var flowControlTypes = PluginUtils.LoadFlowPlugins(path);
-      FlowBlockList.Items.Clear();
+      m_flowControlCollectors = PluginUtils.LoadFlowPlugins(path);
+      m_FlowBlockList.Items.Clear();
 
-      var itemLeft = flowControlTypes.Count;
-      foreach ((string label, Type type) in flowControlTypes)
+      var itemLeft = m_flowControlCollectors.Count;
+      foreach (string label in m_flowControlCollectors.Keys)
       {
         bool isLast = itemLeft-- == 1;
-        FlowBlockList.Items.Add(CreateFlowBlockListItem(label, isLast));
+        m_FlowBlockList.Items.Add(CreateFlowBlockListItem(label, isLast));
       }
     }
 
@@ -58,7 +64,7 @@ namespace Flow.Drafter
         return;
       }
 
-      if (FlowBlockList.SelectedItem is not ListBoxItem item)
+      if (m_FlowBlockList.SelectedItem is not ListBoxItem item)
       {
         return;
       }
@@ -69,18 +75,54 @@ namespace Flow.Drafter
         return;
       }
 
-      DragDrop.DoDragDrop(FlowBlockList, label, DragDropEffects.Copy);
+      DragDrop.DoDragDrop(m_FlowBlockList, label, DragDropEffects.Copy);
     }
     #endregion
 
-    private void Ellipse_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void DesignCanvas_OnDragOver(object sender, DragEventArgs e)
     {
-      var a = 123;
+      if (e.Data.GetDataPresent(typeof(string)))
+      {
+        e.Effects = DragDropEffects.Copy;
+      }
+      else
+      {
+        e.Effects = DragDropEffects.None;
+      }
+
+      e.Handled = true;
     }
 
-    private void Border_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void DesignCanvas_OnDrop(object sender, DragEventArgs e)
     {
-      var a = 123;
+      if (!e.Data.GetDataPresent(typeof(string)))
+      {
+        return;
+      }
+
+      string label = e.Data.GetData(typeof(string)) as string ?? string.Empty;
+      if (string.IsNullOrWhiteSpace(label))
+      {
+        return;
+      }
+
+      if (!m_flowControlCollectors.TryGetValue(label, out FlowControl? flowControl))
+      {
+        return;
+      }
+
+      var canvasFlowControl = flowControl.CreateInstanceOnCanvas(m_editor);
+
+      if (canvasFlowControl is not UIElement element)
+      {
+        return;
+      }
+
+      Point dropPosition = e.GetPosition(m_DesignCanvas);
+      Canvas.SetLeft(element, dropPosition.X);
+      Canvas.SetTop(element, dropPosition.Y);
+      m_DesignCanvas.Children.Add(element);
+      e.Handled = true;
     }
   }
 }

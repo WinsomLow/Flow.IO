@@ -11,5 +11,10 @@ namespace Flow.Core.Control
     {
       InitializeComponent();
     }
+
+    private void Ellipse_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+      e.Handled = true;
+    }
   }
 }

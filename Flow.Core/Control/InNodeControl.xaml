@@ -9,5 +9,6 @@
              Height="20"
              Fill="Black"
              Stroke="white"
-             StrokeThickness="4"/>
+             StrokeThickness="4"
+             MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"/>
 </UserControl>

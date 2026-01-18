@@ -9,9 +9,7 @@ namespace Flow.Core.ViewModel
     private readonly Node m_model = model;
 
     private Point? m_dragOffset;
-
     public Guid Id => m_model.Id;
-
 
     public double X
     {
@@ -41,8 +39,6 @@ namespace Flow.Core.ViewModel
       }
     }
 
-
-    // Connection point: center of node
     public Point Anchor => new(X, Y);
 
     public void BeginDrag(Point mouseCanvasPosition)

@@ -1,13 +1,13 @@
 ﻿using Flow.Core.Control;
 using System.Reflection;
 
-namespace Flow.Drafter.Common.Helper
+namespace Flow.Drafter.Common.Util
 {
   internal class PluginUtils
   {
-    public static Dictionary<string, Type> LoadFlowPlugins(string pluginPath)
+    public static Dictionary<string, FlowControl> LoadFlowPlugins(string pluginPath)
     {
-      var controls = new Dictionary<string, Type>();
+      var controls = new Dictionary<string, FlowControl>();
 
       foreach (Type type in LoadFlowControlTypes(pluginPath))
       {
@@ -16,8 +16,11 @@ namespace Flow.Drafter.Common.Helper
           continue;
         }
 
-        var label = GetFlowTypeLabel(type);
-        controls.Add(label, type);
+        if (GetFlowTypeLabel(type, out var label, out var flowControl) &&
+          flowControl is not null)
+        {
+          controls.Add(label, flowControl);
+        }
       }
 
       return controls;
@@ -36,18 +39,22 @@ namespace Flow.Drafter.Common.Helper
       }
       catch
       {
-        return Array.Empty<Type>();
+        return [];
       }
     }
 
-    private static string GetFlowTypeLabel(Type type)
+    private static bool GetFlowTypeLabel(Type type, out string label, out FlowControl? flowControl)
     {
+      label = string.Empty;
+      flowControl = null;
       if (Activator.CreateInstance(type) is not FlowControl instance)
       {
-        return type.Name;
+        return false;
       }
 
-      return instance.FlowType;
+      label = instance.FlowType;
+      flowControl = instance;
+      return true;
     }
   }
 }

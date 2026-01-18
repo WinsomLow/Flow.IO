@@ -9,5 +9,6 @@
              Height="20"
              Fill="White"
              Stroke="Black"
-             StrokeThickness="4"/>
+             StrokeThickness="4"
+             MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"/>
 </UserControl>

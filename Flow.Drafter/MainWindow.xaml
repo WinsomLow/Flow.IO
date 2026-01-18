@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Flow.Drafter"
-        xmlns:control="clr-namespace:Flow.Core.Control;assembly=Flow.Core"
         mc:Ignorable="d"
         Title="Flow.IO" Height="800" Width="1200">
     <Grid Style="{StaticResource GridBackgroundStyle}">
@@ -21,7 +20,7 @@
             <StackPanel DockPanel.Dock="Top">
                 <TextBlock Text="Flow Blocks"
                            Style="{StaticResource SectionHeaderTextStyle}" />
-                <ListBox x:Name="FlowBlockList"
+                <ListBox x:Name="m_FlowBlockList" x:FieldModifier="private"
                          Style="{StaticResource FlowBlockListStyle}"
                          PreviewMouseMove="FlowBlockList_OnPreviewMouseMove">
                 </ListBox>
@@ -29,35 +28,11 @@
         </DockPanel>
 
         <Border Grid.Column="1"
-                Style="{StaticResource CanvasBorderStyle}"
-                PreviewMouseLeftButtonDown="Border_PreviewMouseLeftButtonDown">
-            <ItemsControl x:Name="DesignCanvas"
-                          Style="{StaticResource DesignCanvasStyle}"
-                          ItemsSource="{Binding Nodes}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Canvas>
-                            <control:InNodeControl Canvas.Left="50"            
-                                                   Canvas.Top="50"/>
-
-                            <control:OutNodeControl Canvas.Left="400"            
-                                                    Canvas.Top="200"/>
-
-                            <Border Canvas.Left="100"            
-                                    Canvas.Top="100"
-                                    Background="White"
-                                    CornerRadius="8">
-                                <TextBox Background="Transparent" Foreground="Black">Hello</TextBox>
-                            </Border>
-                        </Canvas>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                Style="{StaticResource CanvasBorderStyle}">
+            <Canvas x:Name="m_DesignCanvas" x:FieldModifier="private"
+                    Style="{StaticResource DesignCanvasStyle}"
+                    DragOver="DesignCanvas_OnDragOver"
+                    Drop="DesignCanvas_OnDrop" />
         </Border>
     </Grid>
 </Window>
