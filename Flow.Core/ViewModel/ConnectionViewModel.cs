@@ -20,6 +20,8 @@ namespace Flow.Core.ViewModel
       Rebuild();
     }
 
+    public Connection Model => m_model;
+
     public Geometry Path
     {
       get => m_path;

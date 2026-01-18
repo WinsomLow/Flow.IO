@@ -6,7 +6,7 @@
     {
     }
 
-    public Guid Id { get; } = id;
+    public Guid Id { get; set; } = id;
     public Node FromNode { get; set; } = new Node();
     public Node ToNode { get; set; } = new Node();
     public string Label { get; set; } = "";

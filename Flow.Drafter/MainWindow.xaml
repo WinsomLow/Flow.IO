@@ -14,9 +14,11 @@
 
         <DockPanel Margin="12">
             <Button Style="{StaticResource SidebarActionButtonStyle}"
-                    DockPanel.Dock="Bottom">Load</Button>
+                    DockPanel.Dock="Bottom"
+                    Click="LoadButton_OnClick">Load</Button>
             <Button Style="{StaticResource SidebarActionButtonStyle}"
-                    DockPanel.Dock="Bottom">Save</Button>
+                    DockPanel.Dock="Bottom"
+                    Click="SaveButton_OnClick">Save</Button>
             <StackPanel DockPanel.Dock="Top">
                 <TextBlock Text="Flow Blocks"
                            Style="{StaticResource SectionHeaderTextStyle}" />

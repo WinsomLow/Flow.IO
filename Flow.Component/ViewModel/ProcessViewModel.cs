@@ -1,15 +1,13 @@
-﻿using Flow.Core.Common;
-using Flow.Core.Model;
+﻿using Flow.Core.Model;
 
 namespace Flow.Core.ViewModel
 {
   public class ProcessViewModel : FlowViewModel
   {
-    public ProcessViewModel(NodeViewModel inNode, NodeViewModel outNode, FlowModel model): 
-      base(model)
+    public ProcessViewModel(FlowModel model) : base(model)
     {
-      InNode = inNode;
-      OutNode = outNode;
+      InNode = new NodeViewModel(model.InNode);
+      OutNode = new NodeViewModel(model.OutNode);
     }
 
     public NodeViewModel InNode { get; }

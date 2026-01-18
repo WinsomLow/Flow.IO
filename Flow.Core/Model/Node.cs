@@ -8,7 +8,7 @@ namespace Flow.Core.Model
     {
     }
 
-    public Guid Id { get; } = id;
+    public Guid Id { get; set; } = id;
     public Point2D Position { get; set; } = new Point2D();
   }
 }

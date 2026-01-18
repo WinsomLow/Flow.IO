@@ -2,6 +2,8 @@ using Flow.Core.Common;
 using Flow.Core.Control;
 using Flow.Core.Model;
 using Flow.Core.ViewModel;
+using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,10 +19,13 @@ namespace Flow.Component.Component
     private readonly Editor? m_editor = null;
     public Process()
     {
-      var inNode = new NodeViewModel(new Node());
-      var outNode = new NodeViewModel(new Node());
-      var flowModel = new FlowModel();
-      ViewModel = new ProcessViewModel(inNode, outNode, flowModel);
+      var flowModel = new FlowModel
+      {
+        FlowType = FlowType,
+        InNode = new Node(),
+        OutNode = new Node()
+      };
+      ViewModel = new ProcessViewModel(flowModel);
     }
 
     public Process(ProcessViewModel viewModel, Editor editor) : this()
@@ -33,6 +38,7 @@ namespace Flow.Component.Component
       m_OutNode.Editor = editor;
       m_InNode.NodeViewModel = viewModel.InNode;
       m_OutNode.NodeViewModel = viewModel.OutNode;
+      ViewModel.Model.FlowType = FlowType;
       Loaded += Process_OnLoaded;
     }
 
@@ -48,11 +54,26 @@ namespace Flow.Component.Component
 
     public override FlowControl CreateInstanceOnCanvas(Editor editor)
     {
-      var inNode = new NodeViewModel(new Node());
-      var outNode = new NodeViewModel(new Node());
-      var flowModel = new FlowModel();
-      var flowViewModel = new ProcessViewModel(inNode, outNode, flowModel);
+      var flowModel = new FlowModel
+      {
+        FlowType = FlowType,
+        InNode = new Node(),
+        OutNode = new Node()
+      };
+      var flowViewModel = new ProcessViewModel(flowModel);
       return new Process(flowViewModel, editor);
+    }
+
+    public override FlowControl CreateInstanceOnCanvas(Editor editor, FlowModel model)
+    {
+      var flowViewModel = new ProcessViewModel(model);
+      return new Process(flowViewModel, editor);
+    }
+
+    public override void RegisterNodes(Dictionary<Guid, NodeViewModel> nodeLookup)
+    {
+      nodeLookup[ViewModel.InNode.Model.Id] = ViewModel.InNode;
+      nodeLookup[ViewModel.OutNode.Model.Id] = ViewModel.OutNode;
     }
 
     private void Process_OnLoaded(object sender, RoutedEventArgs e)
@@ -103,6 +124,8 @@ namespace Flow.Component.Component
 
       Canvas.SetLeft(moveBlockInfo.ActiveControl, x);
       Canvas.SetTop(moveBlockInfo.ActiveControl, y);
+      ViewModel.Model.Position.X = x;
+      ViewModel.Model.Position.Y = y;
       UpdateNodePositions();
     }
 
