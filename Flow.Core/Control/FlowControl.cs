@@ -1,9 +1,10 @@
 ﻿using System.Windows.Controls;
 
-namespace Flow.Core
+namespace Flow.Core.Control
 {
-  public abstract class FlowControl: UserControl
+  public abstract class FlowControl : UserControl
   {
     public abstract string FlowType { get; }
+
   }
 }

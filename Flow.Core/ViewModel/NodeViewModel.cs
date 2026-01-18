@@ -1,6 +1,8 @@
-﻿using System.Windows;
+﻿using Flow.Core.Common;
+using Flow.Core.Model;
+using System.Windows;
 
-namespace Flow.Core
+namespace Flow.Core.ViewModel
 {
   public sealed class NodeViewModel(Node model) : NotifyObject
   {

@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Styles\" />
+    <Folder Include="Style\" />
   </ItemGroup>
 
 </Project>

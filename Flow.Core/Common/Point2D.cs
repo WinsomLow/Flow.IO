@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Flow.Core
+namespace Flow.Core.Common
 {
   public class Point2D
   {

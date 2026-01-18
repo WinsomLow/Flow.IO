@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Flow.Drafter"
+        xmlns:control="clr-namespace:Flow.Core.Control;assembly=Flow.Core"
         mc:Ignorable="d"
         Title="Flow.IO" Height="800" Width="1200">
     <Grid Style="{StaticResource GridBackgroundStyle}">
@@ -11,27 +12,52 @@
             <ColumnDefinition Width="220" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Border Grid.Column="0"
-                Style="{StaticResource SidebarBorderStyle}">
-            <DockPanel Margin="12">
-                <Button Style="{StaticResource SidebarActionButtonStyle}"
-                        DockPanel.Dock="Bottom">Load</Button>
-                <Button Style="{StaticResource SidebarActionButtonStyle}"
-                        DockPanel.Dock="Bottom">Save</Button>
-                <StackPanel DockPanel.Dock="Top">
-                    <TextBlock Text="Flow Blocks"
-                               Style="{StaticResource SectionHeaderTextStyle}" />
-                    <ListBox x:Name="FlowBlockList"
-                             Style="{StaticResource FlowBlockListStyle}"
-                             PreviewMouseMove="FlowBlockList_OnPreviewMouseMove">
-                    </ListBox>
-                </StackPanel>
-            </DockPanel>
-        </Border>
+
+        <DockPanel Margin="12">
+            <Button Style="{StaticResource SidebarActionButtonStyle}"
+                    DockPanel.Dock="Bottom">Load</Button>
+            <Button Style="{StaticResource SidebarActionButtonStyle}"
+                    DockPanel.Dock="Bottom">Save</Button>
+            <StackPanel DockPanel.Dock="Top">
+                <TextBlock Text="Flow Blocks"
+                           Style="{StaticResource SectionHeaderTextStyle}" />
+                <ListBox x:Name="FlowBlockList"
+                         Style="{StaticResource FlowBlockListStyle}"
+                         PreviewMouseMove="FlowBlockList_OnPreviewMouseMove">
+                </ListBox>
+            </StackPanel>
+        </DockPanel>
+
         <Border Grid.Column="1"
-                Style="{StaticResource CanvasBorderStyle}">
-            <Canvas x:Name="DesignCanvas"  
-                    Style="{StaticResource DesignCanvasStyle}"/>
+                Style="{StaticResource CanvasBorderStyle}"
+                PreviewMouseLeftButtonDown="Border_PreviewMouseLeftButtonDown">
+            <ItemsControl x:Name="DesignCanvas"
+                          Style="{StaticResource DesignCanvasStyle}"
+                          ItemsSource="{Binding Nodes}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Canvas>
+                            <control:InNodeControl Canvas.Left="50"            
+                                                   Canvas.Top="50"/>
+
+                            <control:OutNodeControl Canvas.Left="400"            
+                                                    Canvas.Top="200"/>
+
+                            <Border Canvas.Left="100"            
+                                    Canvas.Top="100"
+                                    Background="White"
+                                    CornerRadius="8">
+                                <TextBox Background="Transparent" Foreground="Black">Hello</TextBox>
+                            </Border>
+                        </Canvas>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </Border>
     </Grid>
 </Window>

@@ -14,6 +14,7 @@ namespace Flow.Drafter
     public MainWindow()
     {
       InitializeComponent();
+      DataContext = new MainWindowViewModel();
       LoadFlowPlugins();
     }
 
@@ -71,5 +72,15 @@ namespace Flow.Drafter
       DragDrop.DoDragDrop(FlowBlockList, label, DragDropEffects.Copy);
     }
     #endregion
+
+    private void Ellipse_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+      var a = 123;
+    }
+
+    private void Border_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+      var a = 123;
+    }
   }
 }

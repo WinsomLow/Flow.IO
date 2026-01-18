@@ -1,4 +1,6 @@
-﻿namespace Flow.Core
+﻿using Flow.Core.Common;
+
+namespace Flow.Core.Model
 {
   public class Node(Guid id)
   {

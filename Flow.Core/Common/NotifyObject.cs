@@ -1,8 +1,7 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Flow.Core
+namespace Flow.Core.Common
 {
   public abstract class NotifyObject : INotifyPropertyChanged
   {
