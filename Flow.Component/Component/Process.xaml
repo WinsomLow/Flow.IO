@@ -1,0 +1,52 @@
+﻿<core:FlowControl x:Class="Flow.Component.Component.Process"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:core="clr-namespace:Flow.Core.Control;assembly=Flow.Core"
+             xmlns:local="clr-namespace:Flow.Component.Component"
+             mc:Ignorable="d"   
+             MouseLeftButtonDown="Process_MouseLeftButtonDown"
+             PreviewMouseMove="Process_PreviewMouseMove"
+             MouseLeftButtonUp="Process_MouseLeftButtonUp">
+    <core:FlowControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Flow.Component;component/Style/FlowStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:FlowControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <core:InNodeControl x:Name="m_InNode" Grid.Column="0"></core:InNodeControl>
+        
+        <Border Grid.Column="1" Style="{StaticResource ProcessNodeBorderStyle}" >
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="28"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Style="{StaticResource ProcessHeaderStyle}" >
+                    <TextBlock Text="Process" Style="{StaticResource ProcessHeaderFontStyle}"/>
+                </Border>
+                <RichTextBox Grid.Row="1"
+                             Style="{StaticResource ProcessRichTextBoxStyle}">
+                    <FlowDocument Style="{StaticResource ProcessDocumentStyle}">
+                        <Paragraph Style="{StaticResource ProcessParagraphStyle}">                           
+                        </Paragraph>
+                    </FlowDocument>
+                </RichTextBox>
+
+            </Grid>
+        </Border>
+
+        <core:OutNodeControl x:Name="m_OutNode" Grid.Column="2"></core:OutNodeControl>
+    </Grid>
+</core:FlowControl>

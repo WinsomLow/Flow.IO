@@ -1,10 +1,14 @@
-using Flow.Core;
+using Flow.Core.Common;
+using Flow.Core.Control;
+using Flow.Core.Model;
+using Flow.Core.ViewModel;
+using Flow.Drafter.Common.Util;
+using Microsoft.Win32;
+using Newtonsoft.Json;
 using System.IO;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Path = System.IO.Path;
 
 namespace Flow.Drafter
 {
@@ -13,205 +17,40 @@ namespace Flow.Drafter
   /// </summary>
   public partial class MainWindow : Window
   {
-    private bool _isDraggingNode;
-    private Point _dragStart;
-    private Point _nodeStart;
-    private FrameworkElement? _draggedNode;
-    private readonly Dictionary<string, Type> _flowControlTypes = new(StringComparer.OrdinalIgnoreCase);
+    private Dictionary<string, FlowControl> m_flowControlCollectors = new(StringComparer.Ordinal);
+    private readonly Editor m_editor;
+    private static readonly JsonSerializerSettings s_jsonSettings = new()
+    {
+      Formatting = Formatting.Indented
+    };
 
     public MainWindow()
     {
       InitializeComponent();
+      m_editor = new Editor(m_DesignCanvas);
+      DataContext = new MainWindowViewModel();
       LoadFlowPlugins();
-    }
-
-    private void FlowBlockList_OnPreviewMouseMove(object sender, MouseEventArgs e)
-    {
-      if (e.LeftButton != MouseButtonState.Pressed)
-      {
-        return;
-      }
-
-      if (FlowBlockList.SelectedItem is not ListBoxItem item)
-      {
-        return;
-      }
-
-      string label = item.Content?.ToString() ?? string.Empty;
-      if (string.IsNullOrWhiteSpace(label))
-      {
-        return;
-      }
-
-      DragDrop.DoDragDrop(FlowBlockList, label, DragDropEffects.Copy);
-    }
-
-    private void DesignCanvas_OnDragOver(object sender, DragEventArgs e)
-    {
-      if (e.Data.GetDataPresent(DataFormats.StringFormat))
-      {
-        e.Effects = DragDropEffects.Copy;
-      }
-      else
-      {
-        e.Effects = DragDropEffects.None;
-      }
-
-      e.Handled = true;
-    }
-
-    private void DesignCanvas_OnDrop(object sender, DragEventArgs e)
-    {
-      if (!e.Data.GetDataPresent(DataFormats.StringFormat))
-      {
-        return;
-      }
-
-      string label = e.Data.GetData(DataFormats.StringFormat) as string ?? string.Empty;
-      if (string.IsNullOrWhiteSpace(label))
-      {
-        return;
-      }
-
-      Point position = e.GetPosition(DesignCanvas);
-      FlowControl? node = CreateFlowNode(label);
-      if (node is null)
-      {
-        return;
-      }
-
-      Canvas.SetLeft(node, position.X - node.Width / 2);
-      Canvas.SetTop(node, position.Y - node.Height / 2);
-      DesignCanvas.Children.Add(node);
-    }
-
-    private FlowControl? CreateFlowNode(string label)
-    {
-      if (!_flowControlTypes.TryGetValue(label, out Type? flowType))
-      {
-        MessageBox.Show($"No FlowControl registered for '{label}'.",
-          "Flow.IO",
-          MessageBoxButton.OK,
-          MessageBoxImage.Warning);
-        return null;
-      }
-
-      if (Activator.CreateInstance(flowType) is not FlowControl node)
-      {
-        MessageBox.Show($"Failed to create FlowControl '{flowType.FullName}'.",
-          "Flow.IO",
-          MessageBoxButton.OK,
-          MessageBoxImage.Warning);
-        return null;
-      }
-
-      node.Width = 140;
-      node.Height = 48;
-      TrySetLabel(node, label);
-
-      node.AddHandler(UIElement.PreviewMouseLeftButtonDownEvent,
-        new MouseButtonEventHandler(Node_OnMouseLeftButtonDown),
-        true);
-      node.AddHandler(UIElement.PreviewMouseMoveEvent,
-        new MouseEventHandler(Node_OnMouseMove),
-        true);
-      node.AddHandler(UIElement.PreviewMouseLeftButtonUpEvent,
-        new MouseButtonEventHandler(Node_OnMouseLeftButtonUp),
-        true);
-      node.Cursor = Cursors.SizeAll;
-
-      return node;
-    }
-
-    private void Node_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-      if (sender is not FrameworkElement node)
-      {
-        return;
-      }
-
-      _draggedNode = node;
-      _isDraggingNode = true;
-      _dragStart = e.GetPosition(DesignCanvas);
-      _nodeStart = new Point(GetCanvasLeft(node), GetCanvasTop(node));
-      node.CaptureMouse();
-      Canvas.SetZIndex(node, 1);
-      e.Handled = true;
-    }
-
-    private void Node_OnMouseMove(object sender, MouseEventArgs e)
-    {
-      if (!_isDraggingNode || _draggedNode is null)
-      {
-        return;
-      }
-
-      Point current = e.GetPosition(DesignCanvas);
-      Vector delta = current - _dragStart;
-      Canvas.SetLeft(_draggedNode, _nodeStart.X + delta.X);
-      Canvas.SetTop(_draggedNode, _nodeStart.Y + delta.Y);
-    }
-
-    private void Node_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-    {
-      if (_draggedNode is null)
-      {
-        return;
-      }
-
-      _draggedNode.ReleaseMouseCapture();
-      Canvas.SetZIndex(_draggedNode, 0);
-      _draggedNode = null;
-      _isDraggingNode = false;
-      e.Handled = true;
-    }
-
-    private static double GetCanvasLeft(FrameworkElement element)
-    {
-      double left = Canvas.GetLeft(element);
-      return double.IsNaN(left) ? 0 : left;
-    }
-
-    private static double GetCanvasTop(FrameworkElement element)
-    {
-      double top = Canvas.GetTop(element);
-      return double.IsNaN(top) ? 0 : top;
     }
 
     private void LoadFlowPlugins()
     {
-      List<(string Label, Type Type)> controls = new();
+      string? dir = Directory.GetParent(AppContext.BaseDirectory)?.FullName;
 
-      foreach (Type type in LoadFlowControlTypes())
-      {
-        if (type.IsAbstract || !typeof(FlowControl).IsAssignableFrom(type))
-        {
-          continue;
-        }
-
-        string label = GetFlowTypeLabel(type);
-        if (string.IsNullOrWhiteSpace(label))
-        {
-          label = type.Name;
-        }
-
-        controls.Add((label, type));
-      }
-
-      if (controls.Count == 0)
+      if (string.IsNullOrWhiteSpace(dir))
       {
         return;
       }
 
-      _flowControlTypes.Clear();
-      FlowBlockList.Items.Clear();
+      string? path = Path.Combine(dir, "Flow.Component.dll");
 
-      for (int i = 0; i < controls.Count; i++)
+      m_flowControlCollectors = PluginUtils.LoadFlowPlugins(path);
+      m_FlowBlockList.Items.Clear();
+
+      var itemLeft = m_flowControlCollectors.Count;
+      foreach (string label in m_flowControlCollectors.Keys)
       {
-        bool isLast = i == controls.Count - 1;
-        (string label, Type type) = controls[i];
-        _flowControlTypes[label] = type;
-        FlowBlockList.Items.Add(CreateFlowBlockListItem(label, isLast));
+        bool isLast = itemLeft-- == 1;
+        m_FlowBlockList.Items.Add(CreateFlowBlockListItem(label, isLast));
       }
     }
 
@@ -225,58 +64,194 @@ namespace Flow.Drafter
       };
     }
 
-    private static IEnumerable<Type> LoadFlowControlTypes()
+    #region Event
+    private void FlowBlockList_OnPreviewMouseMove(object sender, MouseEventArgs e)
     {
-      string? dir = Directory.GetParent(AppContext.BaseDirectory)?.FullName;
-
-      if (string.IsNullOrWhiteSpace(dir))
+      if (e.LeftButton != MouseButtonState.Pressed)
       {
-        return Array.Empty<Type>();
+        return;
       }
 
-      string? path = Path.Combine(dir, "Flow.Component.dll");
-
-      if (string.IsNullOrWhiteSpace(path))
+      if (m_FlowBlockList.SelectedItem is not ListBoxItem item)
       {
-        return Array.Empty<Type>();
+        return;
       }
 
-      Assembly assembly;
-      try
+      string label = item.Content?.ToString() ?? string.Empty;
+      if (string.IsNullOrWhiteSpace(label))
       {
-        assembly = Assembly.LoadFrom(path);
-      }
-      catch
-      {
-        return Array.Empty<Type>();
+        return;
       }
 
-      try
+      DragDrop.DoDragDrop(m_FlowBlockList, label, DragDropEffects.Copy);
+    }
+    #endregion
+
+    private void DesignCanvas_OnDragOver(object sender, DragEventArgs e)
+    {
+      if (e.Data.GetDataPresent(typeof(string)))
       {
-        return assembly.GetTypes();
+        e.Effects = DragDropEffects.Copy;
       }
-      catch (ReflectionTypeLoadException ex)
+      else
       {
-        return ex.Types.Where(type => type is not null).Cast<Type>();
+        e.Effects = DragDropEffects.None;
       }
+
+      e.Handled = true;
     }
 
-    private static string GetFlowTypeLabel(Type type)
+    private void DesignCanvas_OnDrop(object sender, DragEventArgs e)
     {
-      if (Activator.CreateInstance(type) is not FlowControl instance)
+      if (!e.Data.GetDataPresent(typeof(string)))
       {
-        return type.Name;
+        return;
       }
 
-      return instance.FlowType;
+      string label = e.Data.GetData(typeof(string)) as string ?? string.Empty;
+      if (string.IsNullOrWhiteSpace(label))
+      {
+        return;
+      }
+
+      if (!m_flowControlCollectors.TryGetValue(label, out FlowControl? flowControl))
+      {
+        return;
+      }
+
+      var canvasFlowControl = flowControl.CreateInstanceOnCanvas(m_editor);
+
+      if (canvasFlowControl is not UIElement element)
+      {
+        return;
+      }
+
+      Point dropPosition = e.GetPosition(m_DesignCanvas);
+      Canvas.SetLeft(element, dropPosition.X);
+      Canvas.SetTop(element, dropPosition.Y);
+      canvasFlowControl.ViewModel.Model.Position.X = dropPosition.X;
+      canvasFlowControl.ViewModel.Model.Position.Y = dropPosition.Y;
+      m_DesignCanvas.Children.Add(element);
+      e.Handled = true;
     }
 
-    private static void TrySetLabel(FlowControl control, string label)
+    private void SaveButton_OnClick(object sender, RoutedEventArgs e)
     {
-      PropertyInfo? textProperty = control.GetType().GetProperty("Text", BindingFlags.Instance | BindingFlags.Public);
-      if (textProperty?.CanWrite == true && textProperty.PropertyType == typeof(string))
+      var dialog = new SaveFileDialog
       {
-        textProperty.SetValue(control, label);
+        Filter = "Flow files (*.json)|*.json|All files (*.*)|*.*",
+        DefaultExt = "json"
+      };
+
+      if (dialog.ShowDialog(this) != true)
+      {
+        return;
+      }
+
+      var document = BuildDocument();
+      string json = JsonConvert.SerializeObject(document, s_jsonSettings);
+      File.WriteAllText(dialog.FileName, json);
+    }
+
+    private FlowDocument BuildDocument()
+    {
+      var document = new FlowDocument();
+      var blocks = m_DesignCanvas.Children.OfType<FlowControl>().ToList();
+
+      for (int i = 0; i < blocks.Count; i++)
+      {
+        FlowControl block = blocks[i];
+        double left = Canvas.GetLeft(block);
+        double top = Canvas.GetTop(block);
+
+        if (double.IsNaN(left))
+        {
+          left = 0;
+        }
+
+        if (double.IsNaN(top))
+        {
+          top = 0;
+        }
+
+        block.ViewModel.Model.FlowType = block.FlowType;
+        block.ViewModel.Model.Position.X = left;
+        block.ViewModel.Model.Position.Y = top;
+        document.Blocks.Add(block.ViewModel.Model);
+      }
+
+      foreach (var connection in m_editor.Connections)
+      {
+        document.Connections.Add(connection.Model);
+      }
+
+      return document;
+    }
+
+    private void LoadButton_OnClick(object sender, RoutedEventArgs e)
+    {
+      var dialog = new OpenFileDialog
+      {
+        Filter = "Flow files (*.json)|*.json|All files (*.*)|*.*",
+        DefaultExt = "json"
+      };
+
+      if (dialog.ShowDialog(this) != true)
+      {
+        return;
+      }
+
+      string json = File.ReadAllText(dialog.FileName);
+      var document = JsonConvert.DeserializeObject<FlowDocument>(json);
+      if (document is null)
+      {
+        return;
+      }
+
+      LoadDocument(document);
+    }
+
+    private void LoadDocument(FlowDocument document)
+    {
+      m_editor.Connections.Clear();
+      m_DesignCanvas.Children.Clear();
+
+      var nodeLookup = new Dictionary<Guid, NodeViewModel>();
+
+      foreach (var block in document.Blocks)
+      {
+        if (!m_flowControlCollectors.TryGetValue(block.FlowType, out FlowControl? prototype))
+        {
+          continue;
+        }
+
+        FlowControl instance = prototype.CreateInstanceOnCanvas(m_editor, block);
+        if (instance is not UIElement element)
+        {
+          continue;
+        }
+
+        Canvas.SetLeft(element, block.Position.X);
+        Canvas.SetTop(element, block.Position.Y);
+        m_DesignCanvas.Children.Add(element);
+        instance.RegisterNodes(nodeLookup);
+      }
+
+      m_DesignCanvas.UpdateLayout();
+
+      foreach (var connection in document.Connections)
+      {
+        if (!nodeLookup.TryGetValue(connection.FromNode.Id, out var fromNode))
+        {
+          continue;
+        }
+
+        if (!nodeLookup.TryGetValue(connection.ToNode.Id, out var toNode))
+        {
+          continue;
+        }
+
+        m_editor.CreateConnection(fromNode, toNode, connection.Label);
       }
     }
   }
