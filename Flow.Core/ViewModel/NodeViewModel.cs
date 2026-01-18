@@ -10,6 +10,7 @@ namespace Flow.Core.ViewModel
 
     private Point? m_dragOffset;
     public Guid Id => m_model.Id;
+    public Node Model => m_model;
 
     public double X
     {
@@ -21,6 +22,7 @@ namespace Flow.Core.ViewModel
           return;
         }
         m_model.Position.X = value;
+        Notify(nameof(X));
         Notify(nameof(Anchor));
       }
     }
@@ -35,6 +37,7 @@ namespace Flow.Core.ViewModel
           return;
         }
         m_model.Position.Y = value;
+        Notify(nameof(Y));
         Notify(nameof(Anchor));
       }
     }

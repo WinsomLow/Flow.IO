@@ -6,9 +6,9 @@
              xmlns:core="clr-namespace:Flow.Core.Control;assembly=Flow.Core"
              xmlns:local="clr-namespace:Flow.Component.Component"
              mc:Ignorable="d"   
-             MouseLeftButtonDown="Border_MouseLeftButtonDown"
-             PreviewMouseMove="Border_PreviewMouseMove"
-             MouseLeftButtonUp="Border_MouseLeftButtonUp">
+             MouseLeftButtonDown="Process_MouseLeftButtonDown"
+             PreviewMouseMove="Process_PreviewMouseMove"
+             MouseLeftButtonUp="Process_MouseLeftButtonUp">
     <core:FlowControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -24,7 +24,7 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
-        <core:InNodeControl Grid.Column="0"></core:InNodeControl>
+        <core:InNodeControl x:Name="m_InNode" Grid.Column="0"></core:InNodeControl>
         
         <Border Grid.Column="1" Style="{StaticResource ProcessNodeBorderStyle}" >
             <Grid>
@@ -47,6 +47,6 @@
             </Grid>
         </Border>
 
-        <core:OutNodeControl Grid.Column="2"></core:OutNodeControl>
+        <core:OutNodeControl x:Name="m_OutNode" Grid.Column="2"></core:OutNodeControl>
     </Grid>
 </core:FlowControl>

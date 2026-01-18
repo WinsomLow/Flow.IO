@@ -9,10 +9,14 @@ namespace Flow.Core.ViewModel
   {
     private readonly Connection m_model;
     private Geometry m_path = Geometry.Empty;
+    private double _midX;
+    private double _midY;
 
     public ConnectionViewModel(Connection model)
     {
       m_model = model;
+      _midX = 0;
+      _midY = 0;
       Rebuild();
     }
 
@@ -31,7 +35,49 @@ namespace Flow.Core.ViewModel
       }
     }
 
-    private void Rebuild()
+    public double MidPointX
+    {
+      get => _midX;
+      private set
+      {
+        if (Equals(_midX, value))
+        {
+          return;
+        }
+        _midX = value;
+        Notify();
+      }
+    }
+
+    public double MidPointY
+    {
+      get => _midY;
+      private set
+      {
+        if (Equals(_midY, value))
+        {
+          return;
+        }
+        _midY = value;
+        Notify();
+      }
+    }
+
+    public string Label
+    {
+      get => m_model.Label;
+      set
+      {
+        if (Equals(m_model.Label, value))
+        {
+          return;
+        }
+        m_model.Label = value;
+        Notify();
+      }
+    }
+
+    public void Rebuild()
     {
       Point p1 = m_model.FromNode.Position.ToPoint();
       Point p2 = m_model.ToNode.Position.ToPoint();
@@ -50,6 +96,9 @@ namespace Flow.Core.ViewModel
         IsClosed = false
       };
 
+      var center = GetBezierCenter(figure, seg);
+      MidPointX = center.X;
+      MidPointY = center.Y;
       Path = new PathGeometry(new[] { figure });
     }
 

@@ -1,8 +1,8 @@
 ﻿namespace Flow.Core.Model
 {
-  public class Flow(Guid id)
+  public class FlowModel(Guid id)
   {
-    public Flow() : this(Guid.NewGuid())
+    public FlowModel() : this(Guid.NewGuid())
     {
     }
 
