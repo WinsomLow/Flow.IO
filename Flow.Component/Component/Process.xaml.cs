@@ -14,6 +14,7 @@ namespace Flow.Component.Component
   /// <summary>
   /// Interaction logic for Process.xaml
   /// </summary>
+  [FlowPlugin(FlowControl.ApiVersionString)]
   public partial class Process : FlowControl
   {
     private readonly Editor? m_editor = null;

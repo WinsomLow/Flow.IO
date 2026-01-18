@@ -16,6 +16,11 @@ namespace Flow.Drafter.Common.Util
           continue;
         }
 
+        if (!IsCompatiblePluginVersion(type))
+        {
+          continue;
+        }
+
         if (GetFlowTypeLabel(type, out var label, out var flowControl) &&
           flowControl is not null)
         {
@@ -54,6 +59,42 @@ namespace Flow.Drafter.Common.Util
 
       label = instance.FlowType;
       flowControl = instance;
+      return true;
+    }
+
+    private static bool IsCompatiblePluginVersion(Type type)
+    {
+      var attribute = type.GetCustomAttribute<FlowPluginAttribute>();
+      if (attribute is null)
+      {
+        return false;
+      }
+
+      if (!Version.TryParse(attribute.Version, out var pluginVersion))
+      {
+        return false;
+      }
+
+      var coreVersion = FlowControl.ApiVersion;
+
+      if (pluginVersion.Major != coreVersion.Major ||
+        pluginVersion.Minor != coreVersion.Minor)
+      {
+        return false;
+      }
+
+      if (pluginVersion.Build != -1 &&
+        pluginVersion.Build != coreVersion.Build)
+      {
+        return false;
+      }
+
+      if (pluginVersion.Revision != -1 &&
+        pluginVersion.Revision != coreVersion.Revision)
+      {
+        return false;
+      }
+
       return true;
     }
   }
