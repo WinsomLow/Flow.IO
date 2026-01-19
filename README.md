@@ -5,6 +5,8 @@ iterating on flow components. The goal is to make it easy to build a library
 of reusable controls, snap them together visually, and test how data moves
 through a flow.
 
+![FlowDrafter screenshot](Asset/Screenshot%202026-01-19%20124552.png)
+
 The solution is split into a core library, a component library, and the drafter
 app that hosts and loads plugins.
 
